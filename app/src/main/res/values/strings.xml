@@ -4,4 +4,5 @@
     <string name="error_network">网络不可用</string>
     <string name="error_read_write">是否有读写权限？</string>
     <string name="error_URL">URL错误</string>
+    <string name="download_success">下载成功</string>
 </resources>

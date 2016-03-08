@@ -29,6 +29,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
     private String mButton_Text;
     private String mToast_Text;
     private int mProgress;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +48,12 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
                 if (InternetUtil.isNetworkConnected(v.getContext())) {
                     mUrl = mUrlText.getText().toString();
                     mProgressBar.setVisibility(View.VISIBLE);
-                    if(true) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 downloadInBackGround(mUrl);
                             }
                         }).start();
-                    }
                 } else {
                     Toast.makeText(v.getContext(), getString(R.string.error_network), Toast.LENGTH_SHORT).show();
                 }
@@ -84,11 +83,10 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
             if (checkFoldAndFile(foldName, fileName)) return;
 
             startDownload(TotalSize, inputStream, fileName);
-            myRunOniThread("下载", NOCHANGE, "下载成功");
 
         } catch (IOException e) {
             e.printStackTrace();
-            myRunOniThread(null, INVISIBLE, getString(R.string.error_URL));
+            myRunOnUiThread(null, INVISIBLE, getString(R.string.error_URL));
         }
     }
 
@@ -101,14 +99,14 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
     private boolean checkFoldAndFile(File foldName, File fileName) {
         if (!foldName.exists()) {
             if (!foldName.mkdir()) {
-                myRunOniThread(null, INVISIBLE, getString(R.string.error_read_write));
+                myRunOnUiThread(null, INVISIBLE, getString(R.string.error_read_write));
                 return true;
             }
         }
 
         if (fileName.exists()) {
             if (!fileName.delete()) {
-                myRunOniThread(null, INVISIBLE, getString(R.string.error_read_write));
+                myRunOnUiThread(null, INVISIBLE, getString(R.string.error_read_write));
                 return true;
             }
         }
@@ -124,7 +122,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
      */
     private void startDownload(int totalSize, InputStream inputStream, File fileName) throws IOException {
         int downloadSize = 0;
-        byte[] bytes = new byte[1024];
+        byte[] bytes = new byte[2048];
         int length;
         OutputStream outputStream = new FileOutputStream(fileName);
 
@@ -133,11 +131,11 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
             outputStream.flush();
             downloadSize += length;
             int progress = downloadSize * 100 / totalSize;
-            Log.i("abc",progress+"");
-            myRunOniThread("下载中", progress, null);
+            myRunOnUiThread("下载中", progress, null);
 
         }
-
+        myRunOnUiThread("下载", 100, getString(R.string.download_success));
+        Log.i("2","90");
         inputStream.close();
         outputStream.close();
     }
@@ -147,11 +145,10 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
      * @param progress    更改进度条的进度显示，不更改则输入 NOCHANGE；隐藏则 输入 INVISIBLE；
      * @param toast_text  toast显示的文字 不更改则输入 null
      */
-    private synchronized void myRunOniThread(String button_text, int progress, String toast_text) {
+    private synchronized void myRunOnUiThread(String button_text, int progress, String toast_text) {
         mButton_Text = button_text;
         mProgress = progress;
         mToast_Text = toast_text;
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -160,12 +157,18 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
                 }
                 if (mProgress >= 0) {
                     mProgressBar.setProgress(mProgress);
-                    Log.i("cde",mProgress+"");
                 } else if (mProgress == INVISIBLE) {
                     mProgressBar.setVisibility(View.INVISIBLE);
                 }
                 if (mToast_Text != null) {
-                    Toast.makeText(DownloadActivity.this, mToast_Text, Toast.LENGTH_SHORT).show();
+                    if (mToast != null){
+                        mToast.setText(mToast_Text);
+                        mToast.setDuration(Toast.LENGTH_SHORT);
+                        mToast.show();
+                    } else{
+                        mToast = Toast.makeText(DownloadActivity.this, mToast_Text, Toast.LENGTH_SHORT);
+                        mToast.show();
+                    }
                 }
             }
         });
