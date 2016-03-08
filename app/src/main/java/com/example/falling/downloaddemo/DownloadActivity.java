@@ -3,6 +3,7 @@ package com.example.falling.downloaddemo;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -127,11 +128,12 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
         int length;
         OutputStream outputStream = new FileOutputStream(fileName);
 
-        while ((length = inputStream.read(bytes)) != NOCHANGE) {
+        while ((length = inputStream.read(bytes)) != -1) {
             outputStream.write(bytes, 0, length);
             outputStream.flush();
             downloadSize += length;
             int progress = downloadSize * 100 / totalSize;
+            Log.i("abc",progress+"");
             myRunOniThread("下载中", progress, null);
 
         }
@@ -145,7 +147,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
      * @param progress    更改进度条的进度显示，不更改则输入 NOCHANGE；隐藏则 输入 INVISIBLE；
      * @param toast_text  toast显示的文字 不更改则输入 null
      */
-    private void myRunOniThread(String button_text, int progress, String toast_text) {
+    private synchronized void myRunOniThread(String button_text, int progress, String toast_text) {
         mButton_Text = button_text;
         mProgress = progress;
         mToast_Text = toast_text;
@@ -158,6 +160,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
                 }
                 if (mProgress >= 0) {
                     mProgressBar.setProgress(mProgress);
+                    Log.i("cde",mProgress+"");
                 } else if (mProgress == INVISIBLE) {
                     mProgressBar.setVisibility(View.INVISIBLE);
                 }
