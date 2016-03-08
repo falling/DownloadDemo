@@ -46,14 +46,16 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
                 if (InternetUtil.isNetworkConnected(v.getContext())) {
                     mUrl = mUrlText.getText().toString();
                     mProgressBar.setVisibility(View.VISIBLE);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            downloadInBackGround(mUrl);
-                        }
-                    }).start();
+                    if(true) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                downloadInBackGround(mUrl);
+                            }
+                        }).start();
+                    }
                 } else {
-                    Toast.makeText(v.getContext(), "无法上网！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(v.getContext(), getString(R.string.error_network), Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -85,7 +87,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
 
         } catch (IOException e) {
             e.printStackTrace();
-            myRunOniThread(null, INVISIBLE, "创建文件夹或删除文件失败，是否有读写权限？");
+            myRunOniThread(null, INVISIBLE, getString(R.string.error_URL));
         }
     }
 
@@ -98,14 +100,14 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
     private boolean checkFoldAndFile(File foldName, File fileName) {
         if (!foldName.exists()) {
             if (!foldName.mkdir()) {
-                myRunOniThread(null, INVISIBLE, "创建文件夹失败，是否有读写权限？");
+                myRunOniThread(null, INVISIBLE, getString(R.string.error_read_write));
                 return true;
             }
         }
 
         if (fileName.exists()) {
             if (!fileName.delete()) {
-                myRunOniThread(null, INVISIBLE, "删除文件失败，是否有读写权限？");
+                myRunOniThread(null, INVISIBLE, getString(R.string.error_read_write));
                 return true;
             }
         }
