@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">DownloadDemo</string>
-    <string name="download_start">Download</string>
+    <string name="download_start">下载</string>
 </resources>
