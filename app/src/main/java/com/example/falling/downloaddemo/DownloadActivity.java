@@ -125,17 +125,16 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
         byte[] bytes = new byte[2048];
         int length;
         OutputStream outputStream = new FileOutputStream(fileName);
-
+        int progress=0;
         while ((length = inputStream.read(bytes)) != -1) {
             outputStream.write(bytes, 0, length);
             outputStream.flush();
             downloadSize += length;
-            int progress = downloadSize * 100 / totalSize;
+            progress = downloadSize * 100 / totalSize;
             myRunOnUiThread("下载中", progress, null);
 
         }
-        myRunOnUiThread("下载", 100, getString(R.string.download_success));
-        Log.i("2","90");
+        myRunOnUiThread("下载", progress, getString(R.string.download_success));
         inputStream.close();
         outputStream.close();
     }
