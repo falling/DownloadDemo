@@ -132,7 +132,6 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
             downloadSize += length;
             progress = downloadSize * 100 / totalSize;
             myRunOnUiThread("下载中", progress, null);
-
         }
         myRunOnUiThread("下载", progress, getString(R.string.download_success));
         inputStream.close();
@@ -144,7 +143,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
      * @param progress    更改进度条的进度显示，不更改则输入 NOCHANGE；隐藏则 输入 INVISIBLE；
      * @param toast_text  toast显示的文字 不更改则输入 null
      */
-    private synchronized void myRunOnUiThread(String button_text, int progress, String toast_text) {
+    private  void  myRunOnUiThread(String button_text, int progress, final String toast_text) {
         mButton_Text = button_text;
         mProgress = progress;
         mToast_Text = toast_text;
@@ -153,12 +152,14 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
             public void run() {
                 if (mButton_Text != null) {
                     mDownloadButton.setText(mButton_Text);
+                    mButton_Text = null;
                 }
                 if (mProgress >= 0) {
                     mProgressBar.setProgress(mProgress);
                 } else if (mProgress == INVISIBLE) {
                     mProgressBar.setVisibility(View.INVISIBLE);
                 }
+                mProgress = NOCHANGE;
                 if (mToast_Text != null) {
                     if (mToast != null){
                         mToast.setText(mToast_Text);
@@ -169,6 +170,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
                         mToast.show();
                     }
                 }
+                mToast_Text = null;
             }
         });
     }
