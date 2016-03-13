@@ -169,6 +169,7 @@ public class DownloadActivity extends AppCompatActivity implements View.OnClickL
                         mToast = Toast.makeText(DownloadActivity.this, mToast_Text, Toast.LENGTH_SHORT);
                         mToast.show();
                     }
+
                 }
                 mToast_Text = null;
             }
